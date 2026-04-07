@@ -1,1 +1,0 @@
-# Passar slides com os olhos?
