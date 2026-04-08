@@ -1,6 +1,6 @@
 # Sumário Resumido das Ações por Gestos
 
-- 1) Controlo de Reprodução de Música
+## 1) Controlo de Reprodução de Música
 Ações principais do player.
 
 Inclinar direita → Próxima música
