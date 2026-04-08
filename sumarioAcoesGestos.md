@@ -11,34 +11,34 @@ Ações principais do player.
 
 (Virar o telemóvel ao contrário → Parar música)
 
-- 2) Controlo de Volume
+# Controlo de Volume
 Ações contínuas e intuitivas.
 
-Inclinar telemóvel para a frente  → Aumentar volume
-Inclinar telemóvel para a tras → Diminuir volume
+- Inclinar telemóvel para a frente  → Aumentar volume
+- Inclinar telemóvel para a tras → Diminuir volume
 
 (Manter telemóvel inclinado para cima → Aumentar volume gradualmente)
 (Manter telemóvel inclinado para baixo → Diminuir volume gradualmente)
 
-- 3) Modos do Sistema
+# Modos do Sistema
 Estados da aplicação.
 
-Sacudir 1 vez → Ativar modo gestos - c/ janela de pausa entre acções
-Sacudir 1 vez novamente → Desativar modo gestos - c/ janela de pausa entre acções
+- Sacudir 1 vez → Ativar modo gestos - c/ janela de pausa entre acções
+- Sacudir 1 vez novamente → Desativar modo gestos - c/ janela de pausa entre acções
 
 (Tapar sensor por 1 segundo → Bloquear gestos)
 (Tapar sensor por 1 segundo novamente → Desbloquear gestos)
 
-- 4) Feedback ao Utilizador (Automático)
+# Feedback ao Utilizador (Automático)
 Ações do sistema após eventos - confirmação dos comandos
 
-Vibração curta → Gesto reconhecido
-Vibração longa → Erro
-Som curto → Ação executada
-Mensagem no ecrã → Estado atual
-Mostrar nome da playlist ativa
-Mostrar volume atual
-Mostrar música atual
+- Vibração curta → Gesto reconhecido
+- Vibração longa → Erro
+- Som curto → Ação executada
+- Mensagem no ecrã → Estado atual
+- Mostrar nome da playlist ativa
+- Mostrar volume atual
+- Mostrar música atual
 
 # Sensores Utilizados (Resumo)
 
