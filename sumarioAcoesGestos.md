@@ -68,7 +68,7 @@ Operações sobre músicas dentro de uma playlist.
 - Inclinar e manter por 2 segundos → Repetir música atual
 - Rodar 180° → Adicionar música aos favoritos
 
-- 4) Gestão de Playlists (Estrutura)
+## Gestão de Playlists (Estrutura)
 Operações sobre playlists.
 
 - Rodar telemóvel 360° → Criar nova playlist
@@ -76,7 +76,7 @@ Operações sobre playlists.
 - Tapar sensor por 5 segundos → Apagar playlist atual
 - Manter telemóvel imóvel por 3 segundos → Guardar playlist
 
-- 5) Navegação entre Playlists
+## Navegação entre Playlists
 Ações de navegação.
 
 - Rodar ligeiramente para a direita → Próxima playlist
