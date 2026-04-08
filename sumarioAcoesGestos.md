@@ -59,7 +59,8 @@ confirmação
 
 
 # TODO in the future
-- 3) Gestão de Playlist (Músicas)
+
+## Gestão de Playlist (Músicas)
 Operações sobre músicas dentro de uma playlist.
 
 - Sacudir 2 vezes → Adicionar música à playlist ativa
