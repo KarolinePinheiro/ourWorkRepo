@@ -1,6 +1,7 @@
 4) Aplicação: Controlador de Música por Gestos (Área: Multimédia)
+Conceito
 
-Conceito - Controlar música usando movimentos do telemóvel.
+Controlar música usando movimentos do telemóvel.
 
 Por exemplo:
 
