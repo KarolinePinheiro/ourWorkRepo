@@ -1,3 +1,8 @@
+# Layout creation sequence
+
+New Project -> Empty Views Activity -> Language -> Java - Finish
+Leave all other fields untouched
+
 # For git commit -> git push -> RPC errors
 
 - Open terminal and run:
