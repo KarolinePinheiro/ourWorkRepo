@@ -1,4 +1,4 @@
-package org.geeksforgeeks.demo;
+package com.example.myapplication;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         buttonStop = findViewById(R.id.buttonStop);
 
         // Create MediaPlayer instance with a raw audio resource
-        mediaPlayer = MediaPlayer.create(this, R.raw.sound);
+        mediaPlayer = MediaPlayer.create(this, R.raw.test_song);
 
         // Set listener to configure SeekBar and total time after MediaPlayer is ready
         mediaPlayer.setOnPreparedListener(mp -> {
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         // Stop button stops playback and resets UI and MediaPlayer
         buttonStop.setOnClickListener(v -> {
             mediaPlayer.stop();
-            mediaPlayer = MediaPlayer.create(this, R.raw.sound);
+            mediaPlayer = MediaPlayer.create(this, R.raw.test_song);
             seekBar.setProgress(0);
             textCurrentTime.setText("0:00");
             textTotalTime.setText(formatTime(mediaPlayer.getDuration()));
