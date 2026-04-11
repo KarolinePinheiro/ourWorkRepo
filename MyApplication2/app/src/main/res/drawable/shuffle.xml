@@ -1,0 +1,11 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+
+    <!-- Shuffle arrows icon -->
+    <path
+        android:fillColor="#e8eaed"
+        android:pathData="M260,720 L180,640 L260,560 L300,600 L260,640 L380,640 L540,480 L380,320 L260,320 L300,360 L260,400 L180,320 L260,240 L420,240 L620,440 L760,440 L760,360 L840,440 L760,520 L760,440 L620,440 L420,640 L260,640 Z"/>
+</vector>

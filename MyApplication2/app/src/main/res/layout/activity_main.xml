@@ -12,8 +12,7 @@
     android:padding="16dp"
     tools:context=".MainActivity">
 
-    <!-- Album cover -->
-
+    <!-- Album Cover -->
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="250dp"
@@ -22,7 +21,6 @@
         android:src="@drawable/album_cover" />
 
     <!-- SeekBar -->
-
     <SeekBar
         android:id="@+id/seekBar"
         android:layout_width="280dp"
@@ -33,8 +31,7 @@
         android:progressTint="@color/darker_grey"
         android:thumbTint="@color/darker_grey" />
 
-    <!-- Time labels -->
-
+    <!-- Time Labels -->
     <LinearLayout
         android:layout_width="250dp"
         android:layout_height="wrap_content"
@@ -59,27 +56,40 @@
 
     </LinearLayout>
 
-    <!-- Control buttons -->
+    <!-- ========================= -->
+    <!-- CONTROL BUTTONS (UPDATED) -->
+    <!-- Shuffle ADDED -->
+    <!-- ========================= -->
 
     <LinearLayout
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:orientation="horizontal"
-        android:weightSum="5">
+        android:weightSum="6">
 
-        <!-- Previous -->
-
-        <!-- Pause -->
-
+        <!-- NEW: Shuffle Button -->
         <ImageView
-            android:id="@+id/buttonStop"
+            android:id="@+id/buttonShuffle"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
             android:clickable="true"
             android:focusable="true"
-            android:src="@drawable/stop"
+            android:src="@drawable/shuffle"
+            app:tint="@color/darker_grey" />
+
+        <!-- Previous -->
+
+        <!-- Pause -->
+        <ImageView
+            android:id="@+id/buttonPrevious"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/previous"
             app:tint="@color/darker_grey" />
 
         <ImageView
@@ -109,16 +119,6 @@
         <!-- Next -->
 
         <ImageView
-            android:id="@+id/buttonPrevious"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/previous"
-            app:tint="@color/darker_grey" />
-
-        <ImageView
             android:id="@+id/buttonNext"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -126,6 +126,16 @@
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/next"
+            app:tint="@color/darker_grey" />
+
+        <ImageView
+            android:id="@+id/buttonStop"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/stop"
             app:tint="@color/darker_grey" />
 
     </LinearLayout>

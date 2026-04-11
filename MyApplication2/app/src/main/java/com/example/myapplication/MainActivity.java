@@ -10,14 +10,16 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    // MediaPlayer instance
     private MediaPlayer mediaPlayer;
 
-    // Playlist
+    // =========================
+    // CHANGE #1: NOW 4 TRACKS
+    // =========================
     private int[] songs = {
             R.raw.song1,
             R.raw.song2,
@@ -27,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
     private int currentSongIndex = 0;
 
-    // UI
     private SeekBar seekBar;
     private TextView textCurrentTime;
     private TextView textTotalTime;
@@ -38,7 +39,13 @@ public class MainActivity extends AppCompatActivity {
     private ImageView buttonNext;
     private ImageView buttonPrevious;
 
-    // Handler for SeekBar updates
+    // =========================
+    // CHANGE #2: SHUFFLE BUTTON
+    // =========================
+    private ImageView buttonShuffle;
+
+    private final Random random = new Random();
+
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     private final Runnable updateSeekBar = new Runnable() {
@@ -64,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Init UI
         seekBar = findViewById(R.id.seekBar);
         textCurrentTime = findViewById(R.id.textCurrentTime);
         textTotalTime = findViewById(R.id.textTotalTime);
@@ -75,23 +81,26 @@ public class MainActivity extends AppCompatActivity {
         buttonNext = findViewById(R.id.buttonNext);
         buttonPrevious = findViewById(R.id.buttonPrevious);
 
-        // FIX #1:
-        // App starts with NO music playing
+        // CHANGE #3: NEW SHUFFLE BUTTON
+        buttonShuffle = findViewById(R.id.buttonShuffle);
+
+        // App starts WITHOUT auto-play
         loadSong(currentSongIndex, false);
 
+        // =========================
         // PLAY
+        // =========================
         buttonPlay.setOnClickListener(v -> {
 
-            // FIX #2:
-            // Prevent double play
             if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
-
                 mediaPlayer.start();
                 handler.post(updateSeekBar);
             }
         });
 
+        // =========================
         // PAUSE
+        // =========================
         buttonPause.setOnClickListener(v -> {
 
             if (mediaPlayer != null && mediaPlayer.isPlaying()) {
@@ -99,7 +108,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // =========================
         // STOP
+        // =========================
         buttonStop.setOnClickListener(v -> {
 
             if (mediaPlayer != null) {
@@ -116,13 +127,13 @@ public class MainActivity extends AppCompatActivity {
                 textCurrentTime.setText("0:00");
 
                 seekBar.setMax(mediaPlayer.getDuration());
-                textTotalTime.setText(
-                        formatTime(mediaPlayer.getDuration())
-                );
+                textTotalTime.setText(formatTime(mediaPlayer.getDuration()));
             }
         });
 
-        // NEXT
+        // =========================
+        // NEXT (auto-play)
+        // =========================
         buttonNext.setOnClickListener(v -> {
 
             currentSongIndex++;
@@ -131,12 +142,12 @@ public class MainActivity extends AppCompatActivity {
                 currentSongIndex = 0;
             }
 
-            // FIX #3:
-            // Next song auto-plays immediately
-            loadSong(currentSongIndex, true);
+            loadSong(currentSongIndex, true); // CHANGE: auto-play enabled
         });
 
-        // PREVIOUS
+        // =========================
+        // PREVIOUS (auto-play)
+        // =========================
         buttonPrevious.setOnClickListener(v -> {
 
             currentSongIndex--;
@@ -145,12 +156,27 @@ public class MainActivity extends AppCompatActivity {
                 currentSongIndex = songs.length - 1;
             }
 
-            // FIX #3:
-            // Previous song auto-plays immediately
+            loadSong(currentSongIndex, true); // CHANGE: auto-play enabled
+        });
+
+        // =========================
+        // CHANGE #4: SHUFFLE LOGIC (4 TRACKS SAFE)
+        // =========================
+        buttonShuffle.setOnClickListener(v -> {
+
+            int newIndex;
+
+            // ensures we do not repeat same song immediately
+            do {
+                newIndex = random.nextInt(songs.length);
+            } while (newIndex == currentSongIndex && songs.length > 1);
+
+            currentSongIndex = newIndex;
+
+            // CHANGE: shuffle ALWAYS auto-plays
             loadSong(currentSongIndex, true);
         });
 
-        // SeekBar
         seekBar.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
 
@@ -161,12 +187,8 @@ public class MainActivity extends AppCompatActivity {
                             boolean fromUser) {
 
                         if (fromUser && mediaPlayer != null) {
-
                             mediaPlayer.seekTo(progress);
-
-                            textCurrentTime.setText(
-                                    formatTime(progress)
-                            );
+                            textCurrentTime.setText(formatTime(progress));
                         }
                     }
 
@@ -176,43 +198,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // =========================
-    // CORE LOADING FUNCTION
+    // CORE LOAD FUNCTION
     // =========================
-
     private void loadSong(int index, boolean autoPlay) {
 
         if (mediaPlayer != null) {
             mediaPlayer.release();
         }
 
-        mediaPlayer = MediaPlayer.create(
-                this,
-                songs[index]
-        );
+        mediaPlayer = MediaPlayer.create(this, songs[index]);
 
-        // Reset UI
         seekBar.setProgress(0);
         textCurrentTime.setText("0:00");
 
         seekBar.setMax(mediaPlayer.getDuration());
-        textTotalTime.setText(
-                formatTime(mediaPlayer.getDuration())
-        );
+        textTotalTime.setText(formatTime(mediaPlayer.getDuration()));
 
-        // FIX #4:
-        // Auto-play controlled externally (Next/Previous = true, startup = false)
+        // CHANGE: controlled playback behavior
         if (autoPlay) {
-
             mediaPlayer.start();
             handler.post(updateSeekBar);
         }
 
-        mediaPlayer.setOnCompletionListener(
-                mp -> playNextSongAuto()
-        );
+        mediaPlayer.setOnCompletionListener(mp -> playNextSongAuto());
     }
 
-    // Auto-next when song ends
+    // AUTO NEXT
     private void playNextSongAuto() {
 
         currentSongIndex++;
@@ -224,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         loadSong(currentSongIndex, true);
     }
 
-    // Time formatting
+    // TIME FORMATTER
     private String formatTime(int milliseconds) {
 
         long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds);
