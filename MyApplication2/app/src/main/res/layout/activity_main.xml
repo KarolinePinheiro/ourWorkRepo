@@ -12,6 +12,8 @@
     android:padding="16dp"
     tools:context=".MainActivity">
 
+    <!-- Album cover -->
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="250dp"
@@ -19,15 +21,19 @@
         android:scaleType="centerCrop"
         android:src="@drawable/album_cover" />
 
+    <!-- SeekBar -->
+
     <SeekBar
         android:id="@+id/seekBar"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="8dp"
-        android:progress="33"
+        android:progress="0"
         android:progressTint="@color/darker_grey"
         android:thumbTint="@color/darker_grey" />
+
+    <!-- Time labels -->
 
     <LinearLayout
         android:layout_width="250dp"
@@ -50,22 +56,30 @@
             android:layout_weight="1"
             android:gravity="end"
             android:text="0:00" />
+
     </LinearLayout>
+
+    <!-- Control buttons -->
 
     <LinearLayout
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:orientation="horizontal"
-        android:weightSum="3">
+        android:weightSum="5">
+
+        <!-- Previous -->
+
+        <!-- Pause -->
 
         <ImageView
-            android:id="@+id/buttonPause"
+            android:id="@+id/buttonStop"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
             android:clickable="true"
-            android:src="@drawable/pause"
+            android:focusable="true"
+            android:src="@drawable/stop"
             app:tint="@color/darker_grey" />
 
         <ImageView
@@ -73,15 +87,47 @@
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:src="@drawable/play"
             app:tint="@color/darker_grey" />
 
         <ImageView
-            android:id="@+id/buttonStop"
+            android:id="@+id/buttonPause"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:src="@drawable/stop"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/pause"
             app:tint="@color/darker_grey" />
+
+        <!-- Play -->
+
+        <!-- Stop -->
+
+        <!-- Next -->
+
+        <ImageView
+            android:id="@+id/buttonPrevious"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/previous"
+            app:tint="@color/darker_grey" />
+
+        <ImageView
+            android:id="@+id/buttonNext"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/next"
+            app:tint="@color/darker_grey" />
+
     </LinearLayout>
+
 </LinearLayout>
