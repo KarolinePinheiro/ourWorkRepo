@@ -6,4 +6,3 @@
 - After a song finishes a new one is played
 
 - Display song name dynamically
-- Show total number of songs
