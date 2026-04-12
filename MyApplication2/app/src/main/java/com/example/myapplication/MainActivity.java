@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.lang.reflect.Field;          // NEW: Needed for dynamic resource detection
-import java.util.Arrays;                // NEW: Used to sort songs alphabetically
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -19,12 +19,6 @@ public class MainActivity extends AppCompatActivity {
 
     private MediaPlayer mediaPlayer;
 
-    // =========================
-    // CHANGE #1:
-    // Songs array is now dynamic
-    // It will be filled automatically
-    // from all files inside res/raw
-    // =========================
     private int[] songs;
 
     private int currentSongIndex = 0;
@@ -32,6 +26,13 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekBar;
     private TextView textCurrentTime;
     private TextView textTotalTime;
+
+    // =========================
+    // ADD #1:
+    // TextView to display
+    // the current song name
+    // =========================
+    private TextView textSongName;
 
     private ImageView buttonPlay;
     private ImageView buttonPause;
@@ -71,6 +72,12 @@ public class MainActivity extends AppCompatActivity {
         textCurrentTime = findViewById(R.id.textCurrentTime);
         textTotalTime = findViewById(R.id.textTotalTime);
 
+        // =========================
+        // ADD #2:
+        // Bind song name TextView
+        // =========================
+        textSongName = findViewById(R.id.textSongName);
+
         buttonPlay = findViewById(R.id.buttonPlay);
         buttonPause = findViewById(R.id.buttonPause);
         buttonStop = findViewById(R.id.buttonStop);
@@ -78,24 +85,14 @@ public class MainActivity extends AppCompatActivity {
         buttonPrevious = findViewById(R.id.buttonPrevious);
         buttonShuffle = findViewById(R.id.buttonShuffle);
 
-        // =========================
-        // CHANGE #2:
-        // Build songs array dynamically
-        // from res/raw folder
-        // =========================
         songs = loadSongsFromRaw();
 
-        // Safety check
         if (songs.length == 0) {
             return;
         }
 
-        // App starts WITHOUT auto-play
         loadSong(currentSongIndex, false);
 
-        // =========================
-        // PLAY
-        // =========================
         buttonPlay.setOnClickListener(v -> {
 
             if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
@@ -104,9 +101,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // =========================
-        // PAUSE
-        // =========================
         buttonPause.setOnClickListener(v -> {
 
             if (mediaPlayer != null && mediaPlayer.isPlaying()) {
@@ -114,9 +108,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // =========================
-        // STOP
-        // =========================
         buttonStop.setOnClickListener(v -> {
 
             if (mediaPlayer != null) {
@@ -139,9 +130,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // =========================
-        // NEXT
-        // =========================
         buttonNext.setOnClickListener(v -> {
 
             currentSongIndex++;
@@ -153,9 +141,6 @@ public class MainActivity extends AppCompatActivity {
             loadSong(currentSongIndex, true);
         });
 
-        // =========================
-        // PREVIOUS
-        // =========================
         buttonPrevious.setOnClickListener(v -> {
 
             currentSongIndex--;
@@ -167,9 +152,6 @@ public class MainActivity extends AppCompatActivity {
             loadSong(currentSongIndex, true);
         });
 
-        // =========================
-        // SHUFFLE
-        // =========================
         buttonShuffle.setOnClickListener(v -> {
 
             int newIndex;
@@ -216,15 +198,10 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    // =========================
-    // CHANGE #3:
-    // Dynamic loader for res/raw
-    // =========================
     private int[] loadSongsFromRaw() {
 
         Field[] fields = R.raw.class.getFields();
 
-        // Sort alphabetically
         Arrays.sort(fields,
                 (a, b) ->
                         a.getName().compareTo(b.getName())
@@ -245,9 +222,6 @@ public class MainActivity extends AppCompatActivity {
         return tempSongs;
     }
 
-    // =========================
-    // CORE LOAD FUNCTION
-    // =========================
     private void loadSong(int index, boolean autoPlay) {
 
         if (mediaPlayer != null) {
@@ -268,6 +242,14 @@ public class MainActivity extends AppCompatActivity {
                 formatTime(mediaPlayer.getDuration())
         );
 
+        // =========================
+        // ADD #4:
+        // Update song name display
+        // =========================
+        textSongName.setText(
+                getSongName(index)
+        );
+
         if (autoPlay) {
 
             mediaPlayer.start();
@@ -281,8 +263,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // =========================
-    // AUTO NEXT
+    // ADD #3:
+    // Extract song name dynamically
+    // from res/raw resource name
     // =========================
+    private String getSongName(int index) {
+
+        try {
+
+            Field[] fields = R.raw.class.getFields();
+
+            Arrays.sort(fields,
+                    (a, b) ->
+                            a.getName().compareTo(b.getName())
+            );
+
+            String rawName =
+                    fields[index].getName();
+
+            // Convert:
+            // song_name_example
+            // ->
+            // song name example
+
+            return rawName.replace("_", " ");
+
+        }
+        catch (Exception e) {
+
+            return "Unknown song";
+        }
+    }
+
     private void playNextSongAuto() {
 
         currentSongIndex++;

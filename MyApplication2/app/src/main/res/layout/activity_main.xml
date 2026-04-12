@@ -20,6 +20,20 @@
         android:scaleType="centerCrop"
         android:src="@drawable/album_cover" />
 
+    <!-- ========================= -->
+    <!-- NEW: Song Name Display -->
+    <!-- ========================= -->
+
+    <TextView
+        android:id="@+id/textSongName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No song loaded"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/darker_grey" />
+
     <!-- SeekBar -->
     <SeekBar
         android:id="@+id/seekBar"
@@ -80,8 +94,6 @@
             app:tint="@color/darker_grey" />
 
         <!-- Previous -->
-
-        <!-- Pause -->
         <ImageView
             android:id="@+id/buttonPrevious"
             android:layout_width="0dp"
@@ -92,6 +104,7 @@
             android:src="@drawable/previous"
             app:tint="@color/darker_grey" />
 
+        <!-- Play -->
         <ImageView
             android:id="@+id/buttonPlay"
             android:layout_width="0dp"
@@ -102,6 +115,7 @@
             android:src="@drawable/play"
             app:tint="@color/darker_grey" />
 
+        <!-- Pause -->
         <ImageView
             android:id="@+id/buttonPause"
             android:layout_width="0dp"
@@ -112,12 +126,7 @@
             android:src="@drawable/pause"
             app:tint="@color/darker_grey" />
 
-        <!-- Play -->
-
-        <!-- Stop -->
-
         <!-- Next -->
-
         <ImageView
             android:id="@+id/buttonNext"
             android:layout_width="0dp"
@@ -128,6 +137,7 @@
             android:src="@drawable/next"
             app:tint="@color/darker_grey" />
 
+        <!-- Stop -->
         <ImageView
             android:id="@+id/buttonStop"
             android:layout_width="0dp"
