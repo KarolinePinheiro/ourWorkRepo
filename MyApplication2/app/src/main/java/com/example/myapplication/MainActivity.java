@@ -44,10 +44,10 @@ public class MainActivity extends AppCompatActivity
     private ImageView buttonShuffle;
 
     // =========================
-    // ADD — SENSOR TOGGLE
+    // SENSOR TOGGLE
     // =========================
     private ImageView buttonSensors;
-    private boolean sensorsEnabled = true;
+    private boolean sensorsEnabled = false; // ✅ START DISABLED
 
     private final Random random = new Random();
 
@@ -127,10 +127,11 @@ public class MainActivity extends AppCompatActivity
         buttonPrevious = findViewById(R.id.buttonPrevious);
         buttonShuffle = findViewById(R.id.buttonShuffle);
 
-        // =========================
-        // ADD — SENSOR BUTTON BIND
-        // =========================
+        // SENSOR BUTTON
         buttonSensors = findViewById(R.id.buttonSensors);
+
+        // ✅ INITIAL STATE (OFF)
+        buttonSensors.setImageResource(R.drawable.sensors_off);
 
         sensorManager =
                 (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -159,9 +160,7 @@ public class MainActivity extends AppCompatActivity
 
         loadSong(currentSongIndex, true);
 
-        // =========================
-        // ADD — SENSOR TOGGLE LOGIC
-        // =========================
+        // SENSOR TOGGLE LOGIC
         buttonSensors.setOnClickListener(v -> {
 
             sensorsEnabled = !sensorsEnabled;
@@ -282,9 +281,6 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    // =========================
-    // ADD — SENSOR REGISTER METHOD
-    // =========================
     private void registerSensors() {
 
         if (sensorManager != null) {
@@ -312,9 +308,6 @@ public class MainActivity extends AppCompatActivity
 
         super.onResume();
 
-        // =========================
-        // MODIFIED — RESPECT TOGGLE
-        // =========================
         if (sensorsEnabled) {
             registerSensors();
         }
@@ -323,12 +316,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        // =========================
-        // ADD — GLOBAL OFF SWITCH
-        // =========================
         if (!sensorsEnabled) return;
-
-        // (rest of your existing sensor logic remains EXACTLY the same)
 
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
 
