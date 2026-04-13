@@ -43,11 +43,8 @@ public class MainActivity extends AppCompatActivity
     private ImageView buttonPrevious;
     private ImageView buttonShuffle;
 
-    // =========================
-    // SENSOR TOGGLE
-    // =========================
     private ImageView buttonSensors;
-    private boolean sensorsEnabled = false; // ✅ START DISABLED
+    private boolean sensorsEnabled = false;
 
     private final Random random = new Random();
 
@@ -79,11 +76,19 @@ public class MainActivity extends AppCompatActivity
 
     private long lastShakeTimestamp = 0;
 
+    private int shakeCount = 0;
+
     private float lastX;
     private float lastY;
     private float lastZ;
 
     private boolean shakeInitialized = false;
+
+    // =========================
+    // ADD — STATE VARIABLES
+    // =========================
+    private int savedPosition = 0;
+    private boolean wasPlaying = false;
 
     private final Runnable updateSeekBar =
             new Runnable() {
@@ -127,11 +132,32 @@ public class MainActivity extends AppCompatActivity
         buttonPrevious = findViewById(R.id.buttonPrevious);
         buttonShuffle = findViewById(R.id.buttonShuffle);
 
-        // SENSOR BUTTON
         buttonSensors = findViewById(R.id.buttonSensors);
-
-        // ✅ INITIAL STATE (OFF)
         buttonSensors.setImageResource(R.drawable.sensors_off);
+
+        // =========================
+        // RESTORE STATE (UPDATED)
+        // =========================
+        if (savedInstanceState != null) {
+
+            sensorsEnabled =
+                    savedInstanceState.getBoolean("SENSORS_ENABLED", false);
+
+            currentSongIndex =
+                    savedInstanceState.getInt("SONG_INDEX", 0);
+
+            savedPosition =
+                    savedInstanceState.getInt("SONG_POSITION", 0);
+
+            wasPlaying =
+                    savedInstanceState.getBoolean("WAS_PLAYING", false);
+
+            if (sensorsEnabled) {
+                buttonSensors.setImageResource(R.drawable.sensors_on);
+            } else {
+                buttonSensors.setImageResource(R.drawable.sensors_off);
+            }
+        }
 
         sensorManager =
                 (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -158,9 +184,22 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        loadSong(currentSongIndex, true);
+        loadSong(currentSongIndex, false);
 
-        // SENSOR TOGGLE LOGIC
+        // =========================
+        // RESTORE POSITION
+        // =========================
+        if (savedPosition > 0 && mediaPlayer != null) {
+            mediaPlayer.seekTo(savedPosition);
+            seekBar.setProgress(savedPosition);
+            textCurrentTime.setText(formatTime(savedPosition));
+        }
+
+        if (wasPlaying && mediaPlayer != null) {
+            mediaPlayer.start();
+            handler.post(updateSeekBar);
+        }
+
         buttonSensors.setOnClickListener(v -> {
 
             sensorsEnabled = !sensorsEnabled;
@@ -181,7 +220,6 @@ public class MainActivity extends AppCompatActivity
         });
 
         buttonPlay.setOnClickListener(v -> {
-
             if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
                 mediaPlayer.start();
                 handler.post(updateSeekBar);
@@ -189,151 +227,108 @@ public class MainActivity extends AppCompatActivity
         });
 
         buttonPause.setOnClickListener(v -> {
-
             if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
             }
         });
 
         buttonStop.setOnClickListener(v -> {
-
             if (mediaPlayer != null) {
-
                 mediaPlayer.stop();
                 mediaPlayer.release();
-
-                mediaPlayer =
-                        MediaPlayer.create(
-                                this,
-                                songs[currentSongIndex]
-                        );
+                mediaPlayer = MediaPlayer.create(this, songs[currentSongIndex]);
 
                 seekBar.setProgress(0);
                 textCurrentTime.setText("0:00");
 
                 seekBar.setMax(mediaPlayer.getDuration());
-
-                textTotalTime.setText(
-                        formatTime(mediaPlayer.getDuration())
-                );
+                textTotalTime.setText(formatTime(mediaPlayer.getDuration()));
             }
         });
 
         buttonNext.setOnClickListener(v -> {
-
             currentSongIndex++;
-
-            if (currentSongIndex >= songs.length) {
-                currentSongIndex = 0;
-            }
-
+            if (currentSongIndex >= songs.length) currentSongIndex = 0;
             loadSong(currentSongIndex, true);
         });
 
         buttonPrevious.setOnClickListener(v -> {
-
             currentSongIndex--;
-
-            if (currentSongIndex < 0) {
-                currentSongIndex = songs.length - 1;
-            }
-
+            if (currentSongIndex < 0) currentSongIndex = songs.length - 1;
             loadSong(currentSongIndex, true);
         });
 
         buttonShuffle.setOnClickListener(v -> {
-
             int newIndex;
-
             do {
                 newIndex = random.nextInt(songs.length);
-            } while (
-                    newIndex == currentSongIndex
-                            && songs.length > 1
-            );
+            } while (newIndex == currentSongIndex && songs.length > 1);
 
             currentSongIndex = newIndex;
-
             loadSong(currentSongIndex, true);
         });
 
-        seekBar.setOnSeekBarChangeListener(
-                new SeekBar.OnSeekBarChangeListener() {
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && mediaPlayer != null) {
+                    mediaPlayer.seekTo(progress);
+                    textCurrentTime.setText(formatTime(progress));
+                }
+            }
 
-                    @Override
-                    public void onProgressChanged(
-                            SeekBar seekBar,
-                            int progress,
-                            boolean fromUser) {
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+    }
 
-                        if (fromUser && mediaPlayer != null) {
+    // =========================
+    // SAVE STATE (UPDATED)
+    // =========================
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-                            mediaPlayer.seekTo(progress);
+        outState.putBoolean("SENSORS_ENABLED", sensorsEnabled);
+        outState.putInt("SONG_INDEX", currentSongIndex);
 
-                            textCurrentTime.setText(
-                                    formatTime(progress)
-                            );
-                        }
-                    }
-
-                    @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-                    @Override public void onStopTrackingTouch(SeekBar seekBar) {}
-                });
+        if (mediaPlayer != null) {
+            outState.putInt("SONG_POSITION", mediaPlayer.getCurrentPosition());
+            outState.putBoolean("WAS_PLAYING", mediaPlayer.isPlaying());
+        }
     }
 
     private void registerSensors() {
-
         if (sensorManager != null) {
-
             if (accelerometer != null) {
-                sensorManager.registerListener(
-                        this,
-                        accelerometer,
-                        SensorManager.SENSOR_DELAY_NORMAL
-                );
+                sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
             }
-
             if (proximitySensor != null) {
-                sensorManager.registerListener(
-                        this,
-                        proximitySensor,
-                        SensorManager.SENSOR_DELAY_NORMAL
-                );
+                sensorManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
             }
         }
     }
 
     @Override
     protected void onResume() {
-
         super.onResume();
-
-        if (sensorsEnabled) {
-            registerSensors();
-        }
+        if (sensorsEnabled) registerSensors();
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-
         if (!sensorsEnabled) return;
 
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
-
             float distance = event.values[0];
-
             long now = System.currentTimeMillis();
 
-            if (now - lastProximityTime < PROXIMITY_COOLDOWN_MS) {
-                return;
-            }
+            if (now - lastProximityTime < PROXIMITY_COOLDOWN_MS) return;
 
             if (distance == 0) {
-
                 lastProximityTime = now;
 
                 if (mediaPlayer != null) {
-
                     if (mediaPlayer.isPlaying()) {
                         mediaPlayer.pause();
                     } else {
@@ -342,73 +337,39 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
             }
-
             return;
         }
 
-        if (event.sensor.getType()
-                != Sensor.TYPE_ACCELEROMETER) {
-            return;
-        }
+        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) return;
 
         float x = event.values[0];
         float y = event.values[1];
 
         long currentTime = System.currentTimeMillis();
 
-        if (currentTime - lastTiltTime < TILT_COOLDOWN_MS) {
-            return;
-        }
+        if (currentTime - lastTiltTime < TILT_COOLDOWN_MS) return;
 
         if (x < -TILT_THRESHOLD) {
-
             lastTiltTime = currentTime;
-
             currentSongIndex++;
-
-            if (currentSongIndex >= songs.length) {
-                currentSongIndex = 0;
-            }
-
+            if (currentSongIndex >= songs.length) currentSongIndex = 0;
             loadSong(currentSongIndex, true);
-        }
-
-        else if (x > TILT_THRESHOLD) {
-
+        } else if (x > TILT_THRESHOLD) {
             lastTiltTime = currentTime;
-
             currentSongIndex--;
-
-            if (currentSongIndex < 0) {
-                currentSongIndex = songs.length - 1;
-            }
-
+            if (currentSongIndex < 0) currentSongIndex = songs.length - 1;
             loadSong(currentSongIndex, true);
         }
 
         long nowVolume = System.currentTimeMillis();
 
         if (nowVolume - lastVolumeTime > VOLUME_COOLDOWN_MS) {
-
             if (audioManager != null) {
-
                 if (y > VOLUME_TILT_THRESHOLD) {
-
-                    audioManager.adjustVolume(
-                            AudioManager.ADJUST_RAISE,
-                            AudioManager.FLAG_SHOW_UI
-                    );
-
+                    audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
                     lastVolumeTime = nowVolume;
-                }
-
-                else if (y < -VOLUME_TILT_THRESHOLD) {
-
-                    audioManager.adjustVolume(
-                            AudioManager.ADJUST_LOWER,
-                            AudioManager.FLAG_SHOW_UI
-                    );
-
+                } else if (y < -VOLUME_TILT_THRESHOLD) {
+                    audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
                     lastVolumeTime = nowVolume;
                 }
             }
@@ -439,28 +400,37 @@ public class MainActivity extends AppCompatActivity
 
         long now = System.currentTimeMillis();
 
+        final int REQUIRED_SHAKES = 3;
+
+        if (lastShakeTimestamp + SHAKE_RESET_TIME_MS < now) {
+            shakeCount = 0;
+        }
+
         if (acceleration > SHAKE_THRESHOLD) {
 
             if (lastShakeTimestamp + SHAKE_SLOP_TIME_MS > now) return;
 
-            if (lastShakeTimestamp + SHAKE_RESET_TIME_MS < now) {
-                lastShakeTimestamp = 0;
-            }
-
             lastShakeTimestamp = now;
 
-            int newIndex;
+            shakeCount++;
 
-            do {
-                newIndex = random.nextInt(songs.length);
-            } while (
-                    newIndex == currentSongIndex
-                            && songs.length > 1
-            );
+            if (shakeCount >= REQUIRED_SHAKES) {
 
-            currentSongIndex = newIndex;
+                shakeCount = 0;
 
-            loadSong(currentSongIndex, true);
+                int newIndex;
+
+                do {
+                    newIndex = random.nextInt(songs.length);
+                } while (
+                        newIndex == currentSongIndex
+                                && songs.length > 1
+                );
+
+                currentSongIndex = newIndex;
+
+                loadSong(currentSongIndex, true);
+            }
         }
     }
 
@@ -483,10 +453,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadSong(int index, boolean autoPlay) {
-
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-        }
+        if (mediaPlayer != null) mediaPlayer.release();
 
         mediaPlayer = MediaPlayer.create(this, songs[index]);
 
@@ -494,7 +461,6 @@ public class MainActivity extends AppCompatActivity
         textCurrentTime.setText("0:00");
 
         seekBar.setMax(mediaPlayer.getDuration());
-
         textTotalTime.setText(formatTime(mediaPlayer.getDuration()));
         textSongName.setText(getSongName(index));
 
@@ -503,9 +469,7 @@ public class MainActivity extends AppCompatActivity
             handler.post(updateSeekBar);
         }
 
-        mediaPlayer.setOnCompletionListener(
-                mp -> playNextSongAuto()
-        );
+        mediaPlayer.setOnCompletionListener(mp -> playNextSongAuto());
     }
 
     private String getSongName(int index) {
