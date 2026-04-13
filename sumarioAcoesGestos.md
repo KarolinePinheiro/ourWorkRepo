@@ -35,13 +35,16 @@ Estados da aplicação.
 Ações do sistema após eventos - confirmação dos comandos
 
 - Vibração curta → Gesto reconhecido
-- Vibração longa → Erro
-- Som curto → Ação executada
+Shake → vibração (forte e curta)
+Proximity → vibração leve
+Tilt → SEM vibração
+Volume → SEM vibração
 
-- Mensagem no ecrã → Estado atual
-- Mostrar nome da playlist ativa
-- Mostrar volume atual
-- Mostrar música atual
+(Vibração longa → Erro)
+(Som curto → Ação executada)
+
+- Mostrar volume atual ✅
+- Mostrar música atual ✅
 
 # Sensores Utilizados (Resumo)
 
@@ -61,6 +64,9 @@ confirmação
 
 ---
 # TODO in the future
+
+- Mensagem no ecrã → Estado atual
+- Mostrar nome da playlist ativa
 
 ## Gestão de Playlist (Músicas)
 Operações sobre músicas dentro de uma playlist.
