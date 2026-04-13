@@ -36,9 +36,9 @@ Ações do sistema após eventos - confirmação dos comandos
 
 - Vibração curta → Gesto reconhecido
 Shake → vibração (forte e curta)
-Proximity → vibração leve
-Tilt → SEM vibração
-Volume → SEM vibração
+Proximity → vibração leve 
+Tilt → SEM vibração ✅
+Volume → SEM vibração ✅
 
 (Vibração longa → Erro)
 (Som curto → Ação executada)
