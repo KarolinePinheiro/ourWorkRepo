@@ -20,6 +20,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import android.media.AudioManager;
+
 public class MainActivity extends AppCompatActivity
         implements SensorEventListener {
 
@@ -49,24 +51,21 @@ public class MainActivity extends AppCompatActivity
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
-    // =========================
-    // ADD — Proximity sensor
-    // =========================
+    private AudioManager audioManager;
+
+    private static final float VOLUME_TILT_THRESHOLD = 6.0f;
+    private static final long VOLUME_COOLDOWN_MS = 500;
+    private long lastVolumeTime = 0;
+
     private Sensor proximitySensor;
 
     private static final long PROXIMITY_COOLDOWN_MS = 1000;
     private long lastProximityTime = 0;
 
-    // Tilt configuration
-
     private static final float TILT_THRESHOLD = 6.0f;
     private static final long TILT_COOLDOWN_MS = 1500;
 
     private long lastTiltTime = 0;
-
-    // =========================
-    // Shake fields
-    // =========================
 
     private static final float SHAKE_THRESHOLD = 2.7f;
     private static final int SHAKE_SLOP_TIME_MS = 500;
@@ -125,6 +124,9 @@ public class MainActivity extends AppCompatActivity
         sensorManager =
                 (SensorManager) getSystemService(SENSOR_SERVICE);
 
+        audioManager =
+                (AudioManager) getSystemService(AUDIO_SERVICE);
+
         if (sensorManager != null) {
 
             accelerometer =
@@ -132,9 +134,6 @@ public class MainActivity extends AppCompatActivity
                             Sensor.TYPE_ACCELEROMETER
                     );
 
-            // =========================
-            // ADD — Proximity init
-            // =========================
             proximitySensor =
                     sensorManager.getDefaultSensor(
                             Sensor.TYPE_PROXIMITY
@@ -265,9 +264,6 @@ public class MainActivity extends AppCompatActivity
                 );
             }
 
-            // =========================
-            // ADD — Proximity register
-            // =========================
             if (proximitySensor != null) {
                 sensorManager.registerListener(
                         this,
@@ -281,9 +277,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        // =========================
-        // PROXIMITY (handled first)
-        // =========================
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
 
             float distance = event.values[0];
@@ -301,18 +294,15 @@ public class MainActivity extends AppCompatActivity
                 if (mediaPlayer != null) {
 
                     if (mediaPlayer.isPlaying()) {
-
                         mediaPlayer.pause();
-
                     } else {
-
                         mediaPlayer.start();
                         handler.post(updateSeekBar);
                     }
                 }
             }
 
-            return; // IMPORTANT: avoid mixing with accelerometer
+            return;
         }
 
         if (event.sensor.getType()
@@ -321,6 +311,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         float x = event.values[0];
+        float y = event.values[1];
 
         long currentTime = System.currentTimeMillis();
 
@@ -328,7 +319,6 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        // Tilt RIGHT → Next
         if (x < -TILT_THRESHOLD) {
 
             lastTiltTime = currentTime;
@@ -342,7 +332,6 @@ public class MainActivity extends AppCompatActivity
             loadSong(currentSongIndex, true);
         }
 
-        // Tilt LEFT → Previous
         else if (x > TILT_THRESHOLD) {
 
             lastTiltTime = currentTime;
@@ -357,10 +346,39 @@ public class MainActivity extends AppCompatActivity
         }
 
         // =========================
-        // SHAKE
+        // FIXED VOLUME CONTROL
         // =========================
+        long nowVolume = System.currentTimeMillis();
 
-        float y = event.values[1];
+        if (nowVolume - lastVolumeTime > VOLUME_COOLDOWN_MS) {
+
+            if (audioManager != null) {
+
+                // FIX APPLIED:
+                // Tilt toward user → Volume UP
+                if (y > VOLUME_TILT_THRESHOLD) {
+
+                    audioManager.adjustVolume(
+                            AudioManager.ADJUST_RAISE,
+                            AudioManager.FLAG_SHOW_UI
+                    );
+
+                    lastVolumeTime = nowVolume;
+                }
+
+                // Tilt away → Volume DOWN
+                else if (y < -VOLUME_TILT_THRESHOLD) {
+
+                    audioManager.adjustVolume(
+                            AudioManager.ADJUST_LOWER,
+                            AudioManager.FLAG_SHOW_UI
+                    );
+
+                    lastVolumeTime = nowVolume;
+                }
+            }
+        }
+
         float z = event.values[2];
 
         if (!shakeInitialized) {
@@ -415,12 +433,8 @@ public class MainActivity extends AppCompatActivity
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
     private int[] loadSongsFromRaw() {
-
         Field[] fields = R.raw.class.getFields();
-
-        Arrays.sort(fields,
-                (a, b) -> a.getName().compareTo(b.getName()));
-
+        Arrays.sort(fields, (a, b) -> a.getName().compareTo(b.getName()));
         int[] tempSongs = new int[fields.length];
 
         for (int i = 0; i < fields.length; i++) {
@@ -430,7 +444,6 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             }
         }
-
         return tempSongs;
     }
 
@@ -440,18 +453,14 @@ public class MainActivity extends AppCompatActivity
             mediaPlayer.release();
         }
 
-        mediaPlayer =
-                MediaPlayer.create(this, songs[index]);
+        mediaPlayer = MediaPlayer.create(this, songs[index]);
 
         seekBar.setProgress(0);
         textCurrentTime.setText("0:00");
 
         seekBar.setMax(mediaPlayer.getDuration());
 
-        textTotalTime.setText(
-                formatTime(mediaPlayer.getDuration())
-        );
-
+        textTotalTime.setText(formatTime(mediaPlayer.getDuration()));
         textSongName.setText(getSongName(index));
 
         if (autoPlay) {
@@ -465,58 +474,33 @@ public class MainActivity extends AppCompatActivity
     }
 
     private String getSongName(int index) {
-
         try {
-
             Field[] fields = R.raw.class.getFields();
-
-            Arrays.sort(fields,
-                    (a, b) -> a.getName().compareTo(b.getName()));
-
+            Arrays.sort(fields, (a, b) -> a.getName().compareTo(b.getName()));
             String rawName = fields[index].getName();
-
             return rawName.replace("_", " ");
-
         } catch (Exception e) {
             return "Unknown song";
         }
     }
 
     private void playNextSongAuto() {
-
         currentSongIndex++;
-
-        if (currentSongIndex >= songs.length) {
-            currentSongIndex = 0;
-        }
-
+        if (currentSongIndex >= songs.length) currentSongIndex = 0;
         loadSong(currentSongIndex, true);
     }
 
     private String formatTime(int milliseconds) {
-
-        long minutes =
-                TimeUnit.MILLISECONDS.toMinutes(milliseconds);
-
-        long seconds =
-                TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60;
-
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60;
         return String.format("%d:%02d", minutes, seconds);
     }
 
     @Override
     protected void onDestroy() {
-
         super.onDestroy();
-
         handler.removeCallbacks(updateSeekBar);
-
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-        }
-
-        if (sensorManager != null) {
-            sensorManager.unregisterListener(this);
-        }
+        if (mediaPlayer != null) mediaPlayer.release();
+        if (sensorManager != null) sensorManager.unregisterListener(this);
     }
 }
