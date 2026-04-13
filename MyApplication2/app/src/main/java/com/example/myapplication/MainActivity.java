@@ -43,6 +43,12 @@ public class MainActivity extends AppCompatActivity
     private ImageView buttonPrevious;
     private ImageView buttonShuffle;
 
+    // =========================
+    // ADD — SENSOR TOGGLE
+    // =========================
+    private ImageView buttonSensors;
+    private boolean sensorsEnabled = true;
+
     private final Random random = new Random();
 
     private final Handler handler =
@@ -121,6 +127,11 @@ public class MainActivity extends AppCompatActivity
         buttonPrevious = findViewById(R.id.buttonPrevious);
         buttonShuffle = findViewById(R.id.buttonShuffle);
 
+        // =========================
+        // ADD — SENSOR BUTTON BIND
+        // =========================
+        buttonSensors = findViewById(R.id.buttonSensors);
+
         sensorManager =
                 (SensorManager) getSystemService(SENSOR_SERVICE);
 
@@ -147,6 +158,28 @@ public class MainActivity extends AppCompatActivity
         }
 
         loadSong(currentSongIndex, true);
+
+        // =========================
+        // ADD — SENSOR TOGGLE LOGIC
+        // =========================
+        buttonSensors.setOnClickListener(v -> {
+
+            sensorsEnabled = !sensorsEnabled;
+
+            if (sensorsEnabled) {
+
+                registerSensors();
+                buttonSensors.setImageResource(R.drawable.sensors_on);
+
+            } else {
+
+                if (sensorManager != null) {
+                    sensorManager.unregisterListener(this);
+                }
+
+                buttonSensors.setImageResource(R.drawable.sensors_off);
+            }
+        });
 
         buttonPlay.setOnClickListener(v -> {
 
@@ -249,10 +282,10 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    @Override
-    protected void onResume() {
-
-        super.onResume();
+    // =========================
+    // ADD — SENSOR REGISTER METHOD
+    // =========================
+    private void registerSensors() {
 
         if (sensorManager != null) {
 
@@ -275,7 +308,27 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        // =========================
+        // MODIFIED — RESPECT TOGGLE
+        // =========================
+        if (sensorsEnabled) {
+            registerSensors();
+        }
+    }
+
+    @Override
     public void onSensorChanged(SensorEvent event) {
+
+        // =========================
+        // ADD — GLOBAL OFF SWITCH
+        // =========================
+        if (!sensorsEnabled) return;
+
+        // (rest of your existing sensor logic remains EXACTLY the same)
 
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
 
@@ -345,17 +398,12 @@ public class MainActivity extends AppCompatActivity
             loadSong(currentSongIndex, true);
         }
 
-        // =========================
-        // FIXED VOLUME CONTROL
-        // =========================
         long nowVolume = System.currentTimeMillis();
 
         if (nowVolume - lastVolumeTime > VOLUME_COOLDOWN_MS) {
 
             if (audioManager != null) {
 
-                // FIX APPLIED:
-                // Tilt toward user → Volume UP
                 if (y > VOLUME_TILT_THRESHOLD) {
 
                     audioManager.adjustVolume(
@@ -366,7 +414,6 @@ public class MainActivity extends AppCompatActivity
                     lastVolumeTime = nowVolume;
                 }
 
-                // Tilt away → Volume DOWN
                 else if (y < -VOLUME_TILT_THRESHOLD) {
 
                     audioManager.adjustVolume(
