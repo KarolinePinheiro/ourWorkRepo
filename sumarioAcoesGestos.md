@@ -24,9 +24,9 @@ Ações contínuas e intuitivas.
 # Modos do Sistema
 Estados da aplicação.
 
-⚠️ Não recomendado pelas melhores prática de UI - Existe um botão de Sensors ON/OFF toggle ⚠️
-- Sacudir 1 vez → Ativar modo gestos - c/ janela de pausa entre acções ✅ 
-- Sacudir 1 vez novamente → Desativar modo gestos - c/ janela de pausa entre acções ✅ 
+⚠️ Não recomendado pelas melhores prática de UI - Existe um botão de Sensores ON/OFF toggle ⚠️
+- Clicar 1a vez → Ativar modo gestos ✅ 
+- Clicar 2a vez → Desativar modo gestos ✅ 
 
 (Tapar sensor por 1 segundo → Bloquear gestos)
 (Tapar sensor por 1 segundo novamente → Desbloquear gestos)
@@ -44,7 +44,7 @@ Volume → SEM vibração ✅
 (Som curto → Ação executada)
 
 - Mostrar volume atual ✅
-- Mostrar música atual ✅
+- Mostrar música atual (nome) ✅
 
 # Sensores Utilizados (Resumo)
 
