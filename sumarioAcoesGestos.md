@@ -3,6 +3,7 @@
 ## Controlo de Reprodução de Música
 Ações principais do player.
 
+- Identificação da faixa musical → ✅ 
 - Inclinar direita → Próxima música ✅ 
 - Inclinar esquerda → Música anterior ✅ 
 - Tapar sensor de proximidade por 3 segundos → Pausar música - c/ janela de pausa entre acções
