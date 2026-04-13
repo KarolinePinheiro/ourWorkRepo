@@ -36,7 +36,6 @@ Porque demonstra:
 deteção de gestos
 interpretação de sensores
 controlo multimédia
-Nível
 
-Médio
-Muito popular em projetos académicos.
+# TODO after finish main objectives:
+- por cada musica mostrar a capa do album;
