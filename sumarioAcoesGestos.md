@@ -7,7 +7,7 @@ Ações principais do player.
 - Inclinar esquerda → Música anterior ✅ 
 - Tapar sensor de proximidade por 3 segundos → Pausar música - c/ janela de pausa entre acções
 - Tapar sensor de proximidade por 3 segundos → Retomar reprodução - c/ janela de pausa entre acções
-- Sacudir rapidamente → Ativar modo Shuffle 
+- Sacudir rapidamente → Ativar modo Shuffle ✅ 
 
 (Virar o telemóvel ao contrário → Parar música)
 
