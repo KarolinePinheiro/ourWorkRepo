@@ -1,9 +1,14 @@
-# Layout creation sequence
+# Support Links
+https://chatgpt.com/share/69e1f165-1088-83eb-99f0-9a4e4eaf2708
 
+Foundations of User Experience (UX) Design - https://www.coursera.org/learn/foundations-user-experience-design/
+
+# Layout creation sequence
 New Project -> Empty Views Activity -> Language -> Java - Finish
 Leave all other fields untouched
 
 # For git commit -> git push -> RPC errors
+https://chatgpt.com/share/69e1f1bb-4c4c-83eb-ac8e-9e537744a8b3
 
 - Open terminal and run:
 git config --global http.version HTTP/1.1
